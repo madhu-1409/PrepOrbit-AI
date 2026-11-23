@@ -1,4 +1,5 @@
 const { GoogleGenAI } = require('@google/genai');
+const { retrieveRelevantResume } = require('./rag.service');
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY
@@ -77,8 +78,10 @@ const interviewReportJsonSchema = {
 
 async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
 
+    const retrieved = await retrieveRelevantResume(resume, jobDescription);
+    const resumeForPrompt = retrieved || resume;
     const prompt = `Generate a structured interview report as JSON for a candidate with the following details:
-Resume: ${resume}
+Resume: ${resumeForPrompt}
 Self Description: ${selfDescription}
 Job Description: ${jobDescription}
 
